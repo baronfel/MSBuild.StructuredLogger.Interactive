@@ -20,7 +20,7 @@ public class StructuredLogKernelConnector : IKernelConnector
         return Task.FromResult<Kernel>(kernel);
     }
 
-    public static void AddSQLiteKernelConnectorToCurrentRoot()
+    public static void AddStructuredLogKernelToCurrentRoot()
     {
         if (KernelInvocationContext.Current is { } context &&
             context.HandlingKernel.RootKernel is CompositeKernel root)
