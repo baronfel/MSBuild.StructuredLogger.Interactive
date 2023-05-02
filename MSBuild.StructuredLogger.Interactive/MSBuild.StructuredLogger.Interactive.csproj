@@ -1,0 +1,32 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net7.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <IsPackable>true</IsPackable>
+    <PackageDescription>MSBuild Structured Log support for .NET Interactive</PackageDescription>
+    <PackageTags>polyglot notebook dotnet interactive msbuild binlog</PackageTags>
+    <IncludeBuildOutput>true</IncludeBuildOutput>
+    <NoWarn>$(NoWarn);NU5100;NU5104;CS1591;NU5128</NoWarn>
+    <Version>0.0.2</Version>
+    <!-- Optional: Declare that the Repository URL can be published to NuSpec -->
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <!-- Optional: Embed source files that are not tracked by the source control manager to the PDB -->
+    <EmbedUntrackedSources>true</EmbedUntrackedSources>
+    <DebugType>embedded</DebugType>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <AllowedOutputExtensionsInPackageBuildOutputFolder>$(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb</AllowedOutputExtensionsInPackageBuildOutputFolder>
+    <LangVersion>11</LangVersion>
+    <!-- <BuildOutputTargetFolder>interactive-extensions/dotnet</BuildOutputTargetFolder> -->
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.DotNet.Interactive" Version="1.0.0-beta.23205.1" />
+    <PackageReference Include="MSBuild.StructuredLogger" Version="2.1.815" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="extension.dib" Pack="true" PackagePath="interactive-extensions/dotnet" />
+    <None Include="$(OutputPath)/MSBuild.StructuredLogger.Interactive.dll" Pack="true" PackagePath="interactive-extensions/dotnet" />
+  </ItemGroup>
+</Project>
