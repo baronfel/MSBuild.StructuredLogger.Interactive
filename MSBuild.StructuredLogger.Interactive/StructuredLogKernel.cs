@@ -25,14 +25,14 @@ public class StructuredLogKernel : Kernel, IKernelCommandHandler<RequestValue>, 
 
     Task IKernelCommandHandler<RequestValue>.HandleAsync(RequestValue command, KernelInvocationContext context)
     {
-        if (command.Name == "Environment")
+        if (command.Name == "BuildEnvironment")
         {
             context.PublishValueProduced(command, Environment);
         }
-        else if (command.Name == "Projects")
-        { 
-            context.PublishValueProduced(command, Projects); 
-        }
+        // else if (command.Name == "Projects")
+        // { 
+        //     context.PublishValueProduced(command, Projects); 
+        // }
         else 
         { 
             context.Fail(command, message: $"Unknown value '{command.Name}'"); 
@@ -44,8 +44,8 @@ public class StructuredLogKernel : Kernel, IKernelCommandHandler<RequestValue>, 
     Task IKernelCommandHandler<RequestValueInfos>.HandleAsync(RequestValueInfos command, KernelInvocationContext context)
     {
         var values = new KernelValueInfo[] {
-            new KernelValueInfo("Environment", FormattedValue.FromObject(Environment, "application/json")[0]),
-            new KernelValueInfo("Projects", FormattedValue.FromObject(Projects, "application/json")[0]),
+            new KernelValueInfo("BuildEnvironment", FormattedValue.FromObject(Environment, "application/json")[0]),
+            // new KernelValueInfo("Projects", FormattedValue.FromObject(Projects, "application/json")[0]),
          };
         context.Publish(new ValueInfosProduced(values, command));
         return Task.CompletedTask;
