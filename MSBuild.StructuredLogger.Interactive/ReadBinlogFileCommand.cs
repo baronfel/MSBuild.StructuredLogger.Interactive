@@ -18,6 +18,14 @@ public class ReadBinlogFileCommand : ConnectKernelCommand
     public override async Task<IEnumerable<Microsoft.DotNet.Interactive.Kernel>> ConnectKernelsAsync(KernelInvocationContext context, InvocationContext commandLineContext)
     {
         var binlogFile = commandLineContext.ParseResult.GetValueForArgument(BinlogFileArgument);
+        if (binlogFile is null)
+        {
+            throw new InvalidOperationException("The binlog file argument is required.");
+        }
+        if(!binlogFile.Exists)
+        {
+            throw new InvalidOperationException($"The binlog file '{binlogFile.FullName}' does not exist.");
+        }
         IKernelConnector connector = new StructuredLogKernelConnector(binlogFile);
         var localName = commandLineContext.ParseResult.GetValueForOption(KernelNameOption);
         var kernel = await connector.CreateKernelAsync(localName!);

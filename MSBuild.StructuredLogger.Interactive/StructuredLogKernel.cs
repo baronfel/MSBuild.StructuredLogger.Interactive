@@ -13,12 +13,29 @@ using Microsoft.DotNet.Interactive.ValueSharing;
 
 public class StructuredLogKernel : Kernel, IKernelCommandHandler<RequestValue>, IKernelCommandHandler<RequestValueInfos>
 {
-    private IReadOnlyList<(string key, string value)> Environment;
+    private readonly IReadOnlyList<(string name, string[] paths)> DoubleWrites;
+    private readonly (string Name, string Text)[] LongestTasks;
+    private readonly IReadOnlyList<(string key, string value)> Environment;
     // private IReadOnlyList<(Project, ProjectEvaluation)> Projects;
 
     public StructuredLogKernel(string name, FileInfo binlogFile) : base(name)
     {
         var build = Serialization.Read(binlogFile.FullName);
+        BuildAnalyzer.AnalyzeBuild(build);
+        DoubleWrites = 
+            build.FindChild<Folder>("DoubleWrites")?
+                .FindImmediateChildrenOfType<Item>().Select(bucket => {
+                return (bucket.Text, bucket.FindImmediateChildrenOfType<Item>().Select(item => item.Text).ToArray());
+            }).ToArray() ?? Array.Empty<(string, string[])>();
+
+        LongestTasks = 
+            build.FindImmediateChildrenOfType<Folder>().First(
+                f => f.Name.EndsWith("most expensive tasks")
+            )
+            .FindImmediateChildrenOfType<Item>()
+            .Select(t => (t.Name, t.Text))
+            .ToArray();
+            
         Environment = build.EnvironmentFolder.FindImmediateChildrenOfType<Property>().Select(p => (p.Name, p.Value)).ToArray();
         // Projects = build.FindChildrenRecursive<Project>().Select(p => (p, build.FindEvaluation(p.EvaluationId))).ToArray();
     }
@@ -28,6 +45,13 @@ public class StructuredLogKernel : Kernel, IKernelCommandHandler<RequestValue>, 
         if (command.Name == "BuildEnvironment")
         {
             context.PublishValueProduced(command, Environment);
+        } else if (command.Name == "DoubleWrites")
+        {
+            context.PublishValueProduced(command, DoubleWrites);
+        }
+        else if (command.Name == "LongestTasks")
+        {
+            context.PublishValueProduced(command, LongestTasks);
         }
         // else if (command.Name == "Projects")
         // { 
@@ -45,6 +69,8 @@ public class StructuredLogKernel : Kernel, IKernelCommandHandler<RequestValue>, 
     {
         var values = new KernelValueInfo[] {
             new KernelValueInfo("BuildEnvironment", FormattedValue.CreateSingleFromObject(Environment, "application/json")),
+            new KernelValueInfo("DoubleWrites", FormattedValue.CreateSingleFromObject(DoubleWrites, "application/json")),
+            new KernelValueInfo("LongestTasks", FormattedValue.CreateSingleFromObject(LongestTasks, "application/json")),
             // new KernelValueInfo("Projects", FormattedValue.FromObject(Projects, "application/json")[0]),
         };
         context.Publish(new ValueInfosProduced(values, command));

@@ -35,7 +35,7 @@ public class StructuredLogKernelConnector : IKernelConnector
 
             KernelInvocationContext.Current?.Display(
                 new HtmlString(@"<details><summary>Read and query MSBuild Structured Log files.</summary>
-    <p>This extension adds support for reading MSbuild Structured Log files using the <code>#!msbuild %binlogPath%></code> magic command. For more information, run a cell using the <code>#!msbuild</code> magic command.</p>
+    <p>This extension adds support for reading MSbuild Structured Log files using the <code>#!connect msbuild %binlogPath%</code> magic command.</p>
     </details>"),
                 "text/html");
 

@@ -32,3 +32,15 @@ var secretNames = new [] {
 };
 
 env.Where(kvp => secretNames.Any(secret => kvp.Item1 == secret))
+
+#!csharp
+
+#!share DoubleWrites --from msbuild-binlog-mybinlog --as dub
+
+dub
+
+#!csharp
+
+#!share LongestTasks --from msbuild-binlog-mybinlog --as tasks
+
+tasks
