@@ -11,3 +11,24 @@ MSBuild.StructuredLogger.Interactive.StructuredLogKernelConnector.AddStructuredL
 #!csharp
 
 #!connect msbuild ./msbuild.binlog --kernel-name mybinlog
+
+#!csharp
+
+#!share BuildEnvironment --from msbuild-binlog-mybinlog --as env
+
+env
+
+#!csharp
+
+// did any secrets leak into my env?
+
+using System.Collections.Generic;
+using System.Linq;
+
+var secretNames = new [] {
+    "GITHUB_TOKEN",
+    "NUGET_API_KEY",
+    "AZDO_PAT",
+};
+
+env.Where(kvp => secretNames.Any(secret => kvp.Item1 == secret))
