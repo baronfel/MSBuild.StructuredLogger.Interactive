@@ -31,7 +31,7 @@ var secretNames = new [] {
     "AZDO_PAT",
 };
 
-env.Where(kvp => secretNames.Any(secret => kvp.Item1 == secret))
+env.Where(kvp => secretNames.Any(secret => kvp.Key == secret))
 
 #!csharp
 

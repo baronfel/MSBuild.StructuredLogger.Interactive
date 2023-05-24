@@ -13,9 +13,9 @@ using Microsoft.DotNet.Interactive.ValueSharing;
 
 public class StructuredLogKernel : Kernel, IKernelCommandHandler<RequestValue>, IKernelCommandHandler<RequestValueInfos>
 {
-    private readonly IReadOnlyList<(string name, string[] paths)> DoubleWrites;
-    private readonly (string Name, string Text)[] LongestTasks;
-    private readonly IReadOnlyList<(string key, string value)> Environment;
+    private readonly Dictionary<string, string[]> DoubleWrites;
+    private readonly Dictionary<string, string> LongestTasks;
+    private readonly Dictionary<string, string> Environment;
     // private IReadOnlyList<(Project, ProjectEvaluation)> Projects;
 
     public StructuredLogKernel(string name, FileInfo binlogFile) : base(name)
@@ -24,19 +24,18 @@ public class StructuredLogKernel : Kernel, IKernelCommandHandler<RequestValue>, 
         BuildAnalyzer.AnalyzeBuild(build);
         DoubleWrites = 
             build.FindChild<Folder>("DoubleWrites")?
-                .FindImmediateChildrenOfType<Item>().Select(bucket => {
-                return (bucket.Text, bucket.FindImmediateChildrenOfType<Item>().Select(item => item.Text).ToArray());
-            }).ToArray() ?? Array.Empty<(string, string[])>();
+                .FindImmediateChildrenOfType<Item>()
+                .ToDictionary(b => b.Text, b => b.FindImmediateChildrenOfType<Item>().Select(item => item.Text).ToArray())
+            ?? new();
 
         LongestTasks = 
             build.FindImmediateChildrenOfType<Folder>().First(
                 f => f.Name.EndsWith("most expensive tasks")
             )
             .FindImmediateChildrenOfType<Item>()
-            .Select(t => (t.Name, t.Text))
-            .ToArray();
+            .ToDictionary(i => i.Name, i => i.Text);
             
-        Environment = build.EnvironmentFolder.FindImmediateChildrenOfType<Property>().Select(p => (p.Name, p.Value)).ToArray();
+        Environment = build.EnvironmentFolder.FindImmediateChildrenOfType<Property>().ToDictionary(p => p.Name, p => p.Value);
         // Projects = build.FindChildrenRecursive<Project>().Select(p => (p, build.FindEvaluation(p.EvaluationId))).ToArray();
     }
 
