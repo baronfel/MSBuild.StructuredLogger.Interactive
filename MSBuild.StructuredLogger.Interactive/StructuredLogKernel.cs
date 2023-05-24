@@ -14,13 +14,13 @@ using Microsoft.DotNet.Interactive.ValueSharing;
 public class StructuredLogKernel : Kernel, IKernelCommandHandler<RequestValue>, IKernelCommandHandler<RequestValueInfos>
 {
     private IReadOnlyList<(string key, string value)> Environment;
-    private IReadOnlyList<(Project, ProjectEvaluation)> Projects;
+    // private IReadOnlyList<(Project, ProjectEvaluation)> Projects;
 
     public StructuredLogKernel(string name, FileInfo binlogFile) : base(name)
     {
         var build = Serialization.Read(binlogFile.FullName);
         Environment = build.EnvironmentFolder.FindImmediateChildrenOfType<Property>().Select(p => (p.Name, p.Value)).ToArray();
-        Projects = build.FindChildrenRecursive<Project>().Select(p => (p, build.FindEvaluation(p.EvaluationId))).ToArray();
+        // Projects = build.FindChildrenRecursive<Project>().Select(p => (p, build.FindEvaluation(p.EvaluationId))).ToArray();
     }
 
     Task IKernelCommandHandler<RequestValue>.HandleAsync(RequestValue command, KernelInvocationContext context)
@@ -44,9 +44,9 @@ public class StructuredLogKernel : Kernel, IKernelCommandHandler<RequestValue>, 
     Task IKernelCommandHandler<RequestValueInfos>.HandleAsync(RequestValueInfos command, KernelInvocationContext context)
     {
         var values = new KernelValueInfo[] {
-            new KernelValueInfo("BuildEnvironment", FormattedValue.FromObject(Environment, "application/json")[0]),
+            new KernelValueInfo("BuildEnvironment", FormattedValue.CreateSingleFromObject(Environment, "application/json")),
             // new KernelValueInfo("Projects", FormattedValue.FromObject(Projects, "application/json")[0]),
-         };
+        };
         context.Publish(new ValueInfosProduced(values, command));
         return Task.CompletedTask;
     }

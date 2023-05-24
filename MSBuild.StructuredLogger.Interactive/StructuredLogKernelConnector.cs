@@ -25,11 +25,11 @@ public class StructuredLogKernelConnector : IKernelConnector
         if (KernelInvocationContext.Current is { } context &&
             context.HandlingKernel.RootKernel is CompositeKernel root)
         {
-            AddSQLiteKernelConnectorTo(root);
+            AddStructuredLogKernelKernelConnectorTo(root);
         }
     }
 
-    public static void AddSQLiteKernelConnectorTo(CompositeKernel kernel)
+    public static void AddStructuredLogKernelKernelConnectorTo(CompositeKernel kernel)
     {
             kernel.AddKernelConnector(new ReadBinlogFileCommand());
 

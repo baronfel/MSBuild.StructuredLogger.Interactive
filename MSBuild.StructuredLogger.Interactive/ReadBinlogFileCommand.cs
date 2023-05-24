@@ -15,12 +15,12 @@ public class ReadBinlogFileCommand : ConnectKernelCommand
     public Argument<FileInfo> BinlogFileArgument { get;} = 
         new("binlog", "The MSBuild binlog file to read");
 
-    public override async Task<Microsoft.DotNet.Interactive.Kernel> ConnectKernelAsync(KernelInvocationContext context, InvocationContext commandLineContext)
+    public override async Task<IEnumerable<Microsoft.DotNet.Interactive.Kernel>> ConnectKernelsAsync(KernelInvocationContext context, InvocationContext commandLineContext)
     {
         var binlogFile = commandLineContext.ParseResult.GetValueForArgument(BinlogFileArgument);
         IKernelConnector connector = new StructuredLogKernelConnector(binlogFile);
         var localName = commandLineContext.ParseResult.GetValueForOption(KernelNameOption);
         var kernel = await connector.CreateKernelAsync(localName!);
-        return kernel;
+        return new [] { kernel };
     }
 }

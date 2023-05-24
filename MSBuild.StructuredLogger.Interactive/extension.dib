@@ -1,3 +1,13 @@
+#!meta
+
+{"kernelInfo":{"defaultKernelName":"csharp","items":[{"aliases":[],"name":"csharp"}]}}
+
 #!csharp
 
+#r "./bin/Debug/net7.0/publish/MSBuild.StructuredLogger.Interactive.dll"
+
 MSBuild.StructuredLogger.Interactive.StructuredLogKernelConnector.AddStructuredLogKernelToCurrentRoot();
+
+#!csharp
+
+#!connect msbuild ./msbuild.binlog --kernel-name mybinlog
