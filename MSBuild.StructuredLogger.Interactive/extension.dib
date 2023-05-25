@@ -14,7 +14,7 @@ MSBuild.StructuredLogger.Interactive.StructuredLogKernelConnector.AddStructuredL
 
 #!csharp
 
-#!share BuildEnvironment --from msbuild-binlog-mybinlog --as env
+#!set --name env --value @msbuild-binlog-mybinlog:BuildEnvironment 
 
 env
 
@@ -31,16 +31,27 @@ var secretNames = new [] {
     "AZDO_PAT",
 };
 
-env.Where(kvp => secretNames.Any(secret => kvp.Key == secret))
+env.RootElement.EnumerateObject()
+    .Any(p => secretNames.Contains(p.Name)).Display();
+
+#!fsharp
+
+#!set --name env --value @csharp:env
+#!set --name secretNames --value @csharp:secretNames
+
+let s = secretNames.RootElement.EnumerateArray() |> Seq.map (fun v -> v.GetString()) |> Set.ofSeq
+
+env.RootElement.EnumerateObject()
+|> Seq.exists (fun p -> s.Contains(p.Name))
 
 #!csharp
 
-#!share DoubleWrites --from msbuild-binlog-mybinlog --as dub
+#!set --name dub --value @msbuild-binlog-mybinlog:DoubleWrites
 
 dub
 
 #!csharp
 
-#!share LongestTasks --from msbuild-binlog-mybinlog --as tasks
+#!set --name tasks --value @msbuild-binlog-mybinlog:LongestTasks
 
 tasks
